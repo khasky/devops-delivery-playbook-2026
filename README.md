@@ -224,6 +224,12 @@ Canary deployment is one of the best ways to reduce release risk without freezin
 
 A canary is not just "deploy to 5%" It is "deploy to 5% with enough observability and authority to stop".
 
+### The case that defines the stakes
+
+Knight Capital, 1 August 2012. New code was rolled out to eight production servers; one was missed and kept running an old code path that a reused flag now switched on. The firm lost about $440 million in 45 minutes and was gone within days.
+
+Every element of this section exists because of that shape of failure: a rollout that did not reach every host, a flag reused instead of retired, and no authority to stop while the market was open.
+
 ---
 
 ## Feature flags and progressive delivery
@@ -303,6 +309,12 @@ Secret scanning protects what leaks out of the repository. Supply chain integrit
 - attest and sign build artifacts: npm packages with `npm publish --provenance`, container images with sigstore/cosign — SLSA is the useful framing for deciding how far to go;
 - pin dependencies through a lockfile and audit that lockfile in CI; a build that resolves different versions on different days is not reproducible;
 - pin third-party GitHub Actions to full commit SHAs, not tags — a tag can be moved to malicious code after you reviewed it.
+
+### Why the SHA pin is not paranoia
+
+In March 2025 an attacker compromised `tj-actions/changed-files` and rewrote its tags — `v1` through `v45.0.7` — to point at a malicious commit that dumped CI secrets from the runner's memory into the build log. Roughly 23,000 repositories referenced the action (CVE-2025-30066, CISA advisory). Nothing about the workflow files changed; a tag that had already been reviewed simply started resolving to different code.
+
+Pinning to a full commit SHA was the only configuration that did not move. Public build logs made the leaked secrets readable by anyone, so every affected repository owed a rotation, not just an upgrade.
 
 ### The trust rule
 
@@ -391,6 +403,12 @@ jobs:
 ```
 
 The exact toolchain can change. The layered confidence model should not.
+
+### The trigger to be careful with
+
+`pull_request` runs the fork's workflow with no secrets and a read-only token — that is why the layout above is safe for outside contributions. `pull_request_target` is the dangerous sibling: it runs the *base branch* workflow with full secrets and write access, in the context of a pull request whose code you have not reviewed. Check out untrusted code under that trigger and the fork controls a job holding your credentials.
+
+If a fork PR genuinely needs a secret, split it: a `pull_request` job that builds and uploads an artifact, and a separate privileged workflow triggered on `workflow_run` that consumes the artifact without ever checking out fork code.
 
 ---
 
