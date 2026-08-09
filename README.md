@@ -1,6 +1,6 @@
 # DevOps Delivery Playbook
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) [![Web Reactions](https://api.webreactions.app/badge/github/khasky/devops-delivery-playbook.svg)](https://webreactions.app/?utm_source=github&utm_channel=repository&utm_medium=devops-delivery-playbook)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) [![Emojery](https://api.emojery.app/badge/github/khasky/devops-delivery-playbook.svg)](https://emojery.app/react?t=github/khasky/devops-delivery-playbook)
 
 Practical DevOps delivery guide for CI/CD, environments, rollout safety, observability, and release workflows.
 
